@@ -170,3 +170,46 @@ export default MyComponent;
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import MyComponent from './App';
+
+//9. Using and Rendering a Component
+/*
+Agora que definimos uma função Component, podemos utilizá-la
+
+Usamo-os como uma sintaxe HTML:
+<MyComponent />
+
+se precisar identar outras tags dentro, vocÊ deve utilizar uma tag de abertura
+e fechadura:
+<MyComponent />
+    <OtherComponent />
+<MyComponent />
+
+Mas, para renderizar o nosso componente para o browser, temos que utilizar
+o .creaeRoot() e .render() methods de react-dom. Isso é feito no nosso
+entry point, index.js
+
+primeiro, chamamos o createRoot para criar um React root container para 
+disponibilizar o conteúdo visível. Aplicações React geralmente tem um single
+root DOM node, e tudo dentro dele é manuseado pelo React DOM.
+
+Em outras palavras, damos ao createRoot() um elemento DOM para renderizar
+
+ex:
+
+ReactDOM.createRoot(document.getElementById('app));
+
+após o root ser criado, resta apenas chamar o método render na root
+
+ex:
+ReactDOM.createRoot(document.getElementById('app').render(<MyComponent />));
+
+*/
+
+//index.js:
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+import MyComponent from './App';
+ReactDOM.createRoot(document.getElementById('app').render(<MyComponent />));
+
+
