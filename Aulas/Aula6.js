@@ -254,3 +254,288 @@ function Greeting(props) {
 }
 
 // export default Greeting;
+
+//7. Put an Event Handler in a Function Component
+/*
+Você pode, e irá passar, funções como props. é especialmente comum passar
+event handlers como props.
+
+Primeiro, temos que definir um event handler antes de passá-lo para 
+qualquer local. Nesse exercício, vamos definir um event handler
+
+como definimos um event handler em React? 
+Definimos um event handler como um method no componente
+
+ex:
+import React from 'react';
+
+function Example() {
+  function handleEvent() {
+    alert(`I am an event handler.
+      If you see this message,
+      then I have been called.`);
+  }
+  return (
+      <h1 onClick={handleEvent}>
+        Hello world
+      </h1>
+    );
+}
+*/
+import React from 'react';
+import Button from './Button';
+
+
+
+function Talker() {
+  function talk() {
+  let speech = '';
+  for (let i = 0; i < 10000; i++) {
+    speech += 'blah ';
+  }
+  alert(speech);
+}
+  return <Button />;
+}
+
+// export default Talker;
+
+
+//8. Pass an Event Handler as a prop
+import React from 'react';
+import Button from './Button';
+
+function Talker() {
+  function talk() {
+    let speech = '';
+    for (let i = 0; i < 10000; i++) {
+      speech += 'blah ';
+    }
+    alert(speech);
+	}
+  return <Button talk={talk}/>;
+}
+
+// export default Talker;
+
+//9. Receive an Event handler as prop
+/*
+Passamos a função de Talker para o Button
+
+Como utilizá-la? Temos que passar para nosso Button, o props e seu event
+handler
+*/
+import React from 'react';
+
+function Button(props) {
+  return (
+    <button onClick={props.talk}>
+      Click me!
+    </button>
+  );
+}
+
+// export default Button;
+
+//10. handleEVent, onEvent, and props.onEvent
+/*
+Vamos falar sobre nomear coisas
+
+Quando você passa um event handler como um prop, assim como fizemos, há
+dois nomes que você deve escolher. Os dois nomes são definidos no Parent
+Component, O componente que define o event Handler e o passa.
+
+O primeiro nome que você deve escolher é o nome do event handler itself
+
+ex:
+
+function Talker() {
+  function talk() {
+    let speech = '';
+    for (let i = 0; i < 10000; i++) {
+      speech += 'blah ';
+    }
+    alert(speech);
+	}
+  return <Button talk={talk}/>;
+}
+
+nosso event Handler chama-se talk
+
+O segundo nome que você deve escolher, é o nome do prop que você irá usar
+para passar o event handler
+
+para nosso prop name, escolhemos talk também
+  return <Button talk={talk}/>;
+
+Esses dois nomes podem ser o que quisermos. Entretanto, há uma convenção
+que é comumente utilizada.
+
+Assim que ela funciona: primeiro, pense em qual tipo de evento você está
+''escutando'', no nosso exemplo, o event type era "click". Se você está
+fazendo um event handler para um click, você nomeia seu event handler como:
+handleClick, se você está fazendo para um hover, você o nomeia handleHover
+
+ex:
+
+function myClass() {
+  function handleHover() {
+    alert('I am an event handler.');
+    alert('I will be called in response to "hover" events.');
+  }
+}
+
+O seu prop Name deve ser a palavra "on" + o "type" do se event. ex:
+onClick
+onHover
+
+**NOTE QUE**
+se eu coloco um onClick em um Componente JSX, ele não atribui um event
+handler, diferentemente se eu o atribuo em um elemento HTML
+
+<button onClick="bla"> != <MyButton onClick={eventHandler} />
+*/
+
+
+//11. props.children
+/*
+Todo props object de um Componente tem uma propriedade chamada "children"
+props.children irá retornar tudo entre a tag de abertura e fechadura
+da tag JSX
+
+Até então, todos os componentes que vimos foram self-closing tags, ou seja,
+tags que se auto-fecham. Mas pásmem, Elas não precisam ser self-closing!
+Você poderia muito bem escrever <MyFunctionComponent> <MyFunctionComponent/>
+e mesmo assim funcionaria
+
+props.children irá retornar tudo entre <MyFunctionComponent> <MyFunctionComponent/>
+Usando o props.children, podemos separar o outer component, que nesse caso
+é o MyFunctionComponent, do conteúdo, o que o faz flexível e reutilizável.
+
+// Example 1
+<BigButton>
+  I am a child of BigButton.
+</BigButton>
+
+Aqui, props.children nos retornaria 'I am a child of BigButton'
+
+
+// Example 2
+<BigButton>
+  <LilButton />
+</BigButton>
+
+Aqui, props.children nos retornaria <LilButton />
+
+
+// Example 3
+<BigButton />
+
+Aqui, nos retornaria undefined
+*/
+
+
+//App.js
+import React from 'react';
+import List from './List';
+
+function App() {
+  return (
+    <div>
+      <List type='Living Musician'>
+        <li>Sachiko M</li>
+        <li>Harvey Sid Fisher</li>
+      </List>
+      <List type='Living Cat Musician'>
+        <li>Nora the Piano Cat</li>
+      </List>
+    </div>
+  );
+}
+
+// export default App;
+
+//List.js:
+import React from 'react';
+
+function List(props) {
+  let titleText = `Favorite ${props.type}`;
+  if (props.children instanceof Array) {
+    titleText += 's';
+  }
+  return (
+    <div>
+      <h1>{titleText}</h1>
+      <ul>{props.children}</ul> 
+    </div>
+  );
+}
+/*Aqui props.children seria o valor que está sendo passado
+no <li> do app*/
+
+// export default List;
+
+//12. Giving Default Values to props
+/*
+Caso alguma props espere por algum valor, mas não seja passado
+é bom termos um valor default pré-definido
+
+Podemos fazer isso justamente definindo um valor pré-definido
+
+Há 3 maneiras de fazer isto:
+
+Primeira:
+Adicionar um defaultProps static property para o Componente
+ex:
+function Example(props) {
+  return <h1>{props.text}</h1>
+}
+
+Example.defaultProps = {
+  text: 'This is default text',
+};
+
+Segunda:
+Você pode definir o default value diretamente na definição
+do Componente
+
+ex:
+
+function Example({text='This is default text'}) {
+    return <h1>{text}</h1>
+}
+
+Terceira: 
+Você pode definir o valor dentro da função:
+
+function Example(props) {
+  const {text = 'This is default text'} = props;
+  return <h1>{text}</h1>
+}
+
+*/
+
+//Button.js:
+import React from 'react';
+
+function Button(props) {
+  const { text } = props;
+  
+  const buttonText = text || 'Default Text of Big Button';
+
+  return (
+    <button>{buttonText}</button>
+  );
+}
+
+// export default Button;
+
+//App.js:
+import React from 'react';
+import Button from './Button.js';
+
+function App() {
+  return <Button text="" />;
+}
+
+// export default App
