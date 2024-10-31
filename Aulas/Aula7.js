@@ -347,6 +347,162 @@ export default function GroceryCart() {
   );
 }
 
+//7. Objects in State
+/*
+Também podemos utilizar estado com objetos. Quando trabalhamos com uma grande
+quantidade de dados, é maravilhoso agrupá-los dentro de um objeto. Vamos ver
+um exemplo na prática:
+
+export default function Login() {
+  const [formState, setFormState] = useState({});
+  const handleChange = ({ target }) => {
+    const { name, value } = target;
+    setFormState((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  return (
+    <form>
+      <input
+        value={formState.firstName}
+        onChange={handleChange}
+        name="firstName"
+        type="text"
+      />
+      <input
+        value={formState.password}
+        onChange={handleChange}
+        type="password"
+        name="password"
+      />
+    </form>
+  );
+}
+
+Aqui, utilizamos o object destructuring para desempacotar a propriedade
+target, do nosso event, e depois utilizamos object destructuring novamente
+para desempacotar as propriedades name e value do objeto target.
+
+Dentro da state setter callback function, envolvemos as chaves em parênteses:
+
+setFormState((prev) => ( { ...prev }))
+
+Isso fala pro JavaScript que nossas chaves referem-se à um novo objeto
+que será retornado, e daí, utilizamos o spread operator, para preencher
+os fields do nosso state anterior
+
+
+*/
+import React, { useState } from "react";
+
+export default function EditProfile() {
+  const [profile, setProfile] = useState({});
+
+  const handleChange = ({ target }) => {
+    const {name, value} = target;
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    alert(JSON.stringify(profile, '', 2));
+  };
+
+  return (
+    <form>
+      <input
+        value={profile.firstName || ''}
+        name="firstName"
+        type="text"
+        placeholder="First Name"
+        onChange={handleChange}
+      />
+      <input
+        value={profile.lastName || ''}
+        type="text"
+        name="lastName"
+        placeholder="Last Name"
+        onChange={handleChange}
+      />
+      <input
+        value={profile.bday || ''}
+        type="date"
+        name="bday"
+        onChange={handleChange}
+      />
+      <input
+        value={profile.password || ''}
+        type="password"
+        name="password"
+        placeholder="Password"
+        onChange={handleChange}
+      />
+      <button type="submit" onClick={handleSubmit}>Submit</button>
+    </form>
+    
+  );
+}
+
+//8. Separate Hooks for Separate States
+/*
+Enquanto pode ser muito útil guardar dados em uma data collection, como
+um array ou objeto, pode ser muito útil criar criar diferentes variáveis
+de estado para dados que mudam separadamente. Manusear dados dinâmicos é 
+muito mais fácil quando deixamos nosso modelo de dados o mais simples 
+possível
+
+Por exemplo:
+
+function Subject() {
+  const [state, setState] = useState({
+    currentGrade: 'B',
+    classmates: ['Hasan', 'Sam', 'Emma'],
+    classDetails: {topic: 'Math', teacher: 'Ms. Barry', room: 201},
+    exams: [{unit: 1, score: 91}, {unit: 2, score: 88}]
+  })}
+
+
+Para atualizar uma nota, teria que ser algo mais ou menos assim:
+setState((prev) => ({
+ ...prev,
+  exams: prev.exams.map((exam) => {
+    if( exam.unit === updatedExam.unit ){
+      return { 
+        ...exam,
+        score: updatedExam.score
+      };
+    } else {
+      return exam;
+    }
+  }),
+}));
+
+Isso pode funcionar, mas pense o quão trabalhoso poderia ser para ter que
+copiar todos os valores quando formos atualizar algo nesse big state
+object, códigos complexos como essem tendem a causar mais bugs. É melhor
+criar múltiplos estados de variáveis baseado nos valores que queremos mudar
+
+Podemos reescrever o exemplo anterior assim:
+
+function Subject() {
+  const [currentGrade, setGrade] = useState('B');
+  const [classmates, setClassmates] = useState(['Hasan', 'Sam', 'Emma']);
+  const [classDetails, setClassDetails] = useState({topic: 'Math', teacher: 'Ms. Barry', room: 201});
+  const [exams, setExams] = useState([{unit: 1, score: 91}, {unit: 2, score: 88}]);
+}
+
+
+Manusear dados dinâmicos com variáveis separadas de estado têm muitas vantagens,
+como deixar nosso código mais limpo para ler, escrever, testar e reutilizar
+componentes.
+
+
+*/
 
 
 
