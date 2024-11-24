@@ -125,4 +125,162 @@ export default function Timer() {
 }
 
 
+//4. Fetch Data
+/*
+Aprendemos que um padrão de comportamento comjum é chamar a effect function
+toda vez que renderizar
+
+Depois, aprendemos que podemos passar um array vazio como segundo argumento
+do useEffect() se quisermos chamar o useEffect apenas na montagem do componente
+
+Neste exercício, aprenderemos a usar o dependecy array para configurar 
+exatamente quando quisermos que nosso efeito seja chamado
+
+Quando nosso effect é responsável por ''fetch data'' de um server, demos
+atenção exttra pra quando nosso effect será chamado. Chamadas desnecessárias
+podem custar em termos de:
+
+- Processamento
+- Performance
+- Uso de memória para mobile
+- API Service piorado
+
+Quando os dados que nosso componente precisa renderizar não muda, podemos
+passar um empty array dependecy, que os dados serão renderizados após a
+primeira renderização. Quando a resposta é recebida do servidor, podemos
+utilizar o state setter do State Hook para guardar dados da resposta localmente
+no nosso componente para futuras renderizações
+
+Usando o State Hook e Effect Hook juntos é uma maneira poderosa que salva
+nosso componente de fetch dados desnecessários toda vez após uma renderização
+
+Um empty dependency array sinaliza para o nosso Effect Hook que nosso effect
+não necessita de retrabalho, ou seja, não depende de nada. Especificar zero
+dependências significa que o resultado de rodar esse effect não irá mudar
+e chamar nosso effect apenas uma vez é suficiente.
+
+Um dependency array que não está vazio indica para nosso Effect Hook que ele
+pode continuar pulando chamadas até que o valor de uma das variáveis do nosso
+dependency array tenha mudado. Se o valor tiver mudado, o effect Hook chamará
+nosso effect novamente!
+*/
+
+
+
+import React, { useState, useEffect } from "react";
+import { get } from './mockBackend/fetch';
+
+export default function Forecast() {
+  const [data, setData] = useState();
+  const [notes, setNotes] = useState({});
+  const [forecastType, setForecastType] = useState('/daily');
+
+  useEffect(() => {
+    alert('Requested data from server...');
+    get(forecastType).then((response) => {
+      alert('Response: ' + JSON.stringify(response,'',2));
+      setData(response.data);
+    });
+  }, [forecastType]);
+
+  const handleChange = (index) => ({ target }) =>
+    setNotes((prev) => ({
+      ...prev,
+      [index]: target.value
+    }));
+
+  return (
+    <div className='App'>
+      <h1>My Weather Planner</h1>
+      <div>
+        <button onClick={() => setForecastType('/daily')}>5-day</button>
+        <button onClick={() => setForecastType('/hourly')}>Today</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Summary</th>
+            <th>Avg Temp</th>
+            <th>Precip</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data ? data.map((item, i) => (
+            <tr key={item.id}>
+              <td>{item.summary}</td>
+              <td> {item.temp.avg}°F</td>
+              <td>{item.precip}%</td>
+              <td>
+                <input
+                  value={notes[item.id] || ''}
+                  onChange={handleChange(item.id)}
+                />
+              </td>
+            </tr>
+          )) : <p>Loading...</p>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+
+//5. Rules of Hooks
+/*
+Há duas regras para se deixar na mente quando usando Hooks:
+
+1. Apenas chame Hooks no top level
+2. Apenas chame Hooks de funções React
+
+
+Quando o React builda o Virtual DOM, a library chama a função que define
+nosso componente de novo e de novo, por isso é importante deixar nossos
+Hooks no top level, nunca chamamos Hooks dentro de loops, condições ou
+nested functions
+
+
+*/
+import React, { useState, useEffect } from 'react';
+import { get } from './mockBackend/fetch';
+
+export default function Shop() {
+  const [categories, setCategories] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [items, setItems] = useState({});
+
+    useEffect(() => {
+      get('/categories').then((response) => {
+        setCategories(response.data);
+      });
+    }, []);
+  
+
+useEffect(() => {
+    if (selectedCategory && !items[selectedCategory]) {
+
+      get(`/items?category=${selectedCategory}`).then((response) => {
+        setItems((prev) => ({ ...prev, [selectedCategory]: response.data }));
+      });
+    }}, [items, selectedCategory ]);
+
+  return (
+    <div className='App'>
+      <h1>Clothes 'n Things</h1>
+      <nav>
+        {categories.map((category) => (
+          <button key={category} onClick={() => setSelectedCategory(category)}>
+            {category}
+          </button>
+        ))}
+      </nav>
+      <h2>{selectedCategory}</h2>
+      <ul>
+        {!items[selectedCategory]
+          ? null
+          : items[selectedCategory].map((item) => <li key={item}>{item}</li>)}
+      </ul>
+    </div>
+  );
+}
 
